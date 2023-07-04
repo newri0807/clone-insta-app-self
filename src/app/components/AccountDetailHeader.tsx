@@ -4,12 +4,16 @@ import React, { useEffect } from "react";
 import { BeatLoader } from "react-spinners";
 import useSWR, { mutate } from "swr";
 import { UserInfo } from "../service/type";
+import { useSession } from "next-auth/react";
 
 interface props {
   username: string;
 }
 
 function AccountDetailHeader({ username }: props) {
+  const { data: session } = useSession();
+  const nowLoginUserName =
+    session?.user && (session.user as { username: string }).username;
   const { data, error, isLoading } = useSWR(
     `/api/account/detail?userId=${username}`
   );
@@ -31,8 +35,7 @@ function AccountDetailHeader({ username }: props) {
       </div>
     );
 
-  const noUserLoginId = localStorage.getItem("userId") || "";
-  const noUserLoginName = localStorage.getItem("username") || "";
+  console.log(session?.user, `로그인 확인`, data);
 
   const toggleFollow = (id: string) => {
     const data = {
@@ -51,6 +54,7 @@ function AccountDetailHeader({ username }: props) {
         if (response.ok) {
           // 성공적인 응답 처리
           console.log("following change successfully!");
+          mutate(`/api/account/detail?userId=${username}`);
         } else {
           // 실패한 응답 처리
           console.error("Failed to following change.");
@@ -60,7 +64,6 @@ function AccountDetailHeader({ username }: props) {
         console.error("An error occurred:", error);
       });
   };
-  console.log(data.user.username, noUserLoginName);
 
   return (
     <div>
@@ -72,7 +75,7 @@ function AccountDetailHeader({ username }: props) {
         <div className="w-6/12 flex justify-around items-center gap-2 flex-wrap ">
           <div className="w-full flex justify-start gap-2 items-center">
             <p>{data.user.username}</p>
-            {data.user.username !== noUserLoginName && (
+            {session?.user && data.user.username !== nowLoginUserName && (
               <button
                 onClick={() => toggleFollow(data?.user?.id)}
                 className={`rounded-md text-white text-center min-w-[100px] p-1 ${

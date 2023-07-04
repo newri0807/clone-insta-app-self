@@ -109,8 +109,10 @@ export async function getUserPostDetail(userId: string) {
     }));
 
   const isLoginUserFollowing =
-    nowloginUser.following &&
-    nowloginUser.following.some((follow: Post) => follow.username === userId);
+    nowloginUser?.following &&
+    nowloginUser.following.find((follow: Post) => follow.username === userId)
+      ? true
+      : false;
 
   const processedPosts = uploadingAllPosts.map((post: Post) => ({
     ...post,
