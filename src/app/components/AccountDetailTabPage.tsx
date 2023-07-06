@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useState, useEffect } from "react";
-import useSWR, { mutate } from "swr";
+import useSWR, { mutate, useSWRConfig } from "swr";
 import DetailPopUp from "./DetailPopUp";
 import { RiseLoader } from "react-spinners";
 import { Post, UserInfo } from "../service/type";
@@ -14,19 +14,15 @@ function AccountDetailTabPage({ username }: props) {
   const [activeTab, setActiveTab] = useState("POSTS");
   const [showPopup, setShowPopup] = useState(false);
   const [forPostPopup, setForPostPopup] = useState<Post | undefined>(undefined);
-  const { data, error, isLoading } = useSWR(
-    `/api/account/detail?userId=${username}`
+  const { data, error, isLoading, mutate } = useSWR(
+    `/api/account/detail?userId=${username}`,
+    {
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+      refreshInterval: 5000,
+      revalidateOnMount: true,
+    }
   );
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      mutate(`/post/${username}`); // 데이터 갱신
-    }, 10000); // 10초마다 갱신
-
-    return () => {
-      clearInterval(interval); // 컴포넌트 언마운트 시 타이머 정리
-    };
-  }, [data, username]);
 
   if (error) return <div>failed to load</div>;
   if (isLoading)

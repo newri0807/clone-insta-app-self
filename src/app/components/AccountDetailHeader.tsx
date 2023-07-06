@@ -2,7 +2,7 @@
 import Avatar from "@/app/components/Avartar";
 import React, { useEffect } from "react";
 import { BeatLoader } from "react-spinners";
-import useSWR, { mutate } from "swr";
+import useSWR, { mutate, useSWRConfig } from "swr";
 import { UserInfo } from "../service/type";
 import { useSession } from "next-auth/react";
 
@@ -17,15 +17,7 @@ function AccountDetailHeader({ username }: props) {
   const { data, error, isLoading } = useSWR(
     `/api/account/detail?userId=${username}`
   );
-  useEffect(() => {
-    const interval = setInterval(() => {
-      mutate(`/api/account/detail?userId=${username}`); // 데이터 갱신
-    }, 10000); // 10초마다 갱신
-
-    return () => {
-      clearInterval(interval); // 컴포넌트 언마운트 시 타이머 정리
-    };
-  }, [data, username]);
+  const { mutate } = useSWRConfig();
 
   if (error) return <div>failed to load</div>;
   if (isLoading)
@@ -35,10 +27,10 @@ function AccountDetailHeader({ username }: props) {
       </div>
     );
 
-  console.log(session?.user, `로그인 확인`, data);
+  //console.log(session?.user, `로그인 확인--------------`, data);
 
   const toggleFollow = (id: string) => {
-    const data = {
+    const data_ = {
       postUserId: id, // 게시물 ID를 적절히 지정해야 합니다.
       userId: localStorage.getItem("userId") || "",
     };
@@ -48,13 +40,13 @@ function AccountDetailHeader({ username }: props) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data_),
     })
       .then((response) => {
         if (response.ok) {
           // 성공적인 응답 처리
-          console.log("following change successfully!");
           mutate(`/api/account/detail?userId=${username}`);
+          console.log("following change successfully!", data);
         } else {
           // 실패한 응답 처리
           console.error("Failed to following change.");
@@ -69,7 +61,7 @@ function AccountDetailHeader({ username }: props) {
     <div>
       <div className="flex justify-center gap-1 w-full m-auto">
         <div className="w-6/12 flex justify-end mr-2">
-          <Avatar img={data.user.image} active={true} size="" />
+          <Avatar img={data.user?.image} active={true} size="" />
         </div>
 
         <div className="w-6/12 flex justify-around items-center gap-2 flex-wrap ">
