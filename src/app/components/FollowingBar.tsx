@@ -26,26 +26,24 @@ const FollowingBar = () => {
     _id: string;
   };
   const responsive = {
-    superLargeDesktop: {
-      breakpoint: { max: 4000, min: 3000 },
-      items: 10,
-    },
     desktop: {
-      breakpoint: { max: 3000, min: 1024 },
+      breakpoint: { max: 4000, min: 576 },
       items: 10,
-    },
-    tablet: {
-      breakpoint: { max: 1024, min: 464 },
-      items: 5,
     },
     mobile: {
-      breakpoint: { max: 464, min: 0 },
-      items: 2,
+      breakpoint: { max: 576, min: 0 },
+      items: 5,
     },
   };
   return (
     <div className="w-full p-6 bg-white rounded-lg shadow ">
-      <Carousel infinite autoPlay responsive={responsive} itemClass="m-1">
+      <Carousel
+        infinite
+        autoPlay
+        responsive={responsive}
+        itemClass="m-1"
+        containerClass="w-full flex gap-1"
+      >
         {data.following.map(({ image, index, username, _id }: props) => (
           <div key={username} className="flex justify-center">
             <Link href={`/post/${username}`}>

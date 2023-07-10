@@ -30,7 +30,7 @@ const Avatar = ({ img, active, size }: Props) => {
     <>
       {img && (
         <img
-          className={`m-[0 auto] rounded-full overflow-hidden min-w-[48px]  ${getSizeClassName()} ${getClassNames()}`}
+          className={`m-[0 auto] object-cover rounded-full overflow-hidden min-w-[48px]  ${getSizeClassName()} ${getClassNames()}`}
           src={img}
           alt=""
         />

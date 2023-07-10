@@ -19,7 +19,7 @@ function TapImg({ item }: any) {
         src={item.image}
         alt={item.username}
         onClick={handleImageClick}
-        className="max-w-full max-h-full object-contain cursor-pointer"
+        className="max-w-full max-h-full  cursor-pointer object-cover my-1"
         style={{ aspectRatio: "1/1" }}
       />
       {showPopup && (
