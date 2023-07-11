@@ -16,12 +16,7 @@ function AccountDetailHeader({ username }: props) {
     session?.user && (session.user as { username: string }).username;
 
   const { data, error, isLoading } = useSWR(
-    `/api/account/detail?userId=${username}`,
-    {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      refreshInterval: 1000,
-    }
+    `/api/account/detail?userId=${username}`
   );
   //const { mutate } = useSWRConfig();
 
@@ -65,48 +60,46 @@ function AccountDetailHeader({ username }: props) {
 
   return (
     <div>
-      {data && (
-        <>
-          <div className="flex justify-center gap-1 w-full m-auto">
-            <div className="w-6/12 flex justify-end mr-2">
-              <Avatar img={data.user.image} active={true} size="" />
-            </div>
-
-            <div className="w-6/12 flex justify-around items-center gap-2 flex-wrap ">
-              <div className="w-full flex justify-start gap-2 items-center">
-                <p>{data.user.username}</p>
-                {session?.user && data.user.username !== nowLoginUserName && (
-                  <button
-                    onClick={() => toggleFollow(data?.user?.id)}
-                    className={`rounded-md text-white text-center min-w-[100px] p-1 ${
-                      data.isLoginUserFollowing ? `bg-red-700` : `bg-blue-500`
-                    }`}
-                  >
-                    {data.isLoginUserFollowing ? `unfollow` : `follow`} {}
-                  </button>
-                )}
-              </div>
-              <div className="w-full flex justify-start gap-2 text-sm items-center">
-                <p>
-                  {" "}
-                  <strong>
-                    {data.uploadingAllPosts?.length || 0}
-                  </strong> posts{" "}
-                </p>
-                <p>
-                  <strong>{data.user.followers?.length || 0}</strong> followers
-                </p>
-                <p>
-                  <strong>{data.user.following?.length || 0}</strong> following
-                </p>
-              </div>
-              <strong className="w-full flex justify-start gap-2 text-sm items-center">
-                {data.user?.name || ""}
-              </strong>
-            </div>
+      <>
+        <div className="flex justify-center gap-1 w-full m-auto">
+          <div className="w-6/12 flex justify-end mr-2">
+            <Avatar img={data.user.image} active={true} size="" />
           </div>
-        </>
-      )}
+
+          <div className="w-6/12 flex justify-around items-center gap-2 flex-wrap ">
+            <div className="w-full flex justify-start gap-2 items-center">
+              <p>{data.user.username}</p>
+              {session?.user && data.user.username !== nowLoginUserName && (
+                <button
+                  onClick={() => toggleFollow(data?.user?.id)}
+                  className={`rounded-md text-white text-center min-w-[100px] p-1 ${
+                    data.isLoginUserFollowing ? `bg-red-700` : `bg-blue-500`
+                  }`}
+                >
+                  {data.isLoginUserFollowing ? `unfollow` : `follow`} {}
+                </button>
+              )}
+            </div>
+            <div className="w-full flex justify-start gap-2 text-sm items-center">
+              <p>
+                {" "}
+                <strong>
+                  {data.uploadingAllPosts?.length || 0}
+                </strong> posts{" "}
+              </p>
+              <p>
+                <strong>{data.user.followers?.length || 0}</strong> followers
+              </p>
+              <p>
+                <strong>{data.user.following?.length || 0}</strong> following
+              </p>
+            </div>
+            <strong className="w-full flex justify-start gap-2 text-sm items-center">
+              {data.user?.name || ""}
+            </strong>
+          </div>
+        </div>
+      </>
     </div>
   );
 }
