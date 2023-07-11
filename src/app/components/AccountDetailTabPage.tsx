@@ -14,13 +14,12 @@ function AccountDetailTabPage({ username }: props) {
   const [activeTab, setActiveTab] = useState("POSTS");
   const [showPopup, setShowPopup] = useState(false);
   const [forPostPopup, setForPostPopup] = useState<Post | undefined>(undefined);
-  const { data, error, isLoading, mutate } = useSWR(
+  const { data, error, isLoading } = useSWR(
     `/api/account/detail?userId=${username}`,
     {
       revalidateOnFocus: true,
       revalidateOnReconnect: true,
-      refreshInterval: 5000,
-      revalidateOnMount: true,
+      refreshInterval: 1000,
     }
   );
 

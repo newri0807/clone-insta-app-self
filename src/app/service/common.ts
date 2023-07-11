@@ -1,7 +1,10 @@
-export const toggleBookmark = async (post_id: string, type: boolean) => {
+export const toggleBookmark = async (
+  post_id: string,
+  nowLoginUserName?: string
+) => {
   const data = {
     postId: post_id, // 게시물 ID를 적절히 지정해야 합니다.
-    userId: localStorage.getItem("userId") || "",
+    userId: nowLoginUserName || "",
   };
 
   await fetch("/api/post/bookmark", {
@@ -20,6 +23,7 @@ export const toggleBookmark = async (post_id: string, type: boolean) => {
         console.error("Failed to post Bookmark🔖.");
         if (response.status === 401) {
           alert(`로그인 후 사용 가능한 기능입니다.😊`);
+          return;
         }
       }
     })
@@ -28,10 +32,10 @@ export const toggleBookmark = async (post_id: string, type: boolean) => {
     });
 };
 
-export const toggleLike = async (post_id: String) => {
+export const toggleLike = async (post_id: String, nowLoginUserName: string) => {
   const data = {
     postId: post_id, // 게시물 ID를 적절히 지정해야 합니다.
-    userId: localStorage.getItem("userId") || "",
+    userId: nowLoginUserName || "",
   };
 
   await fetch("/api/post/like", {
@@ -50,6 +54,7 @@ export const toggleLike = async (post_id: String) => {
         console.error("Failed to post Like❤️‍🔥.");
         if (response.status === 401) {
           alert(`로그인 후 사용 가능한 기능입니다.😊`);
+          return;
         }
       }
     })

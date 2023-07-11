@@ -207,6 +207,7 @@ import { MdInsertEmoticon } from "react-icons/md";
 import { format } from "timeago.js";
 import { Post } from "../service/type";
 import useSWR, { mutate, useSWRConfig } from "swr";
+import { useSession } from "next-auth/react";
 
 type Props = {
   item: Post;
@@ -216,6 +217,10 @@ type Props = {
 
 function DetailPopUp({ item, setShowPopup, userName }: Props) {
   const [comment, setComment] = useState("");
+  const { data: session } = useSession();
+  const nowLoginUserId =
+    (session?.user && (session.user as { id: string }).id) || "";
+
   // const { data, error, isLoading } = useSWR(
   //   `/api/account/detail?userId=${userName}`,
   //   {
@@ -224,7 +229,6 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
   //     refreshInterval: 5000,
   //   }
   // );
-  console.log(item, `000000`);
 
   function handleSubmit(e: { preventDefault: () => void }) {
     e.preventDefault(); // 폼의 기본 동작(페이지 새로고침)을 막습니다.
@@ -233,7 +237,7 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
     const data = {
       postId: item?._id, // 게시물 ID를 적절히 지정해야 합니다.
       comment,
-      userId: localStorage.getItem("userId") || "",
+      userId: nowLoginUserId || "",
     };
 
     // 서버로 데이터를 전송합니다.
@@ -263,7 +267,7 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
   const toggleLikeStatus = async () => {
     try {
       // 좋아요 상태 토글 요청 보내기
-      await toggleLike(item._id);
+      await toggleLike(item._id, nowLoginUserId);
 
       // 데이터 업데이트
       mutate(`/api/account/detail?userId=${userName}`, {
@@ -279,7 +283,7 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
   const toggleBookmarkStatus = async () => {
     try {
       // 북마크 상태 토글 요청 보내기
-      await toggleBookmark(item._id, item.isBookmarked);
+      await toggleBookmark(item._id, nowLoginUserId);
 
       // 데이터 업데이트
       mutate(`/api/account/detail?userId=${userName}`, {
