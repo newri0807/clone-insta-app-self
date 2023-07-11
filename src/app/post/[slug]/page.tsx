@@ -10,7 +10,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props) {
   return {
-    title: `Post Title: ${params.slug}`,
+    title: `${params.slug} · Instantgram Photos`,
+    description: `${params.slug}'s all Instantgram posts`,
   };
 }
 

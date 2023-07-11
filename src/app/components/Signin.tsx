@@ -1,4 +1,12 @@
+import { Metadata } from "next";
 import { ClientSafeProvider, signIn } from "next-auth/react";
+
+export const metadata: Metadata = {
+  title: {
+    default: "SignIn",
+    template: "Signup or Login to Instantgram",
+  },
+};
 
 type Props = {
   providers: Record<string, ClientSafeProvider>;

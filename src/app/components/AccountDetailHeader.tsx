@@ -14,6 +14,7 @@ function AccountDetailHeader({ username }: props) {
   const { data: session } = useSession();
   const nowLoginUserName =
     session?.user && (session.user as { username: string }).username;
+
   const { data, error, isLoading } = useSWR(
     `/api/account/detail?userId=${username}`
   );

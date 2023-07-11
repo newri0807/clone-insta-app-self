@@ -74,7 +74,7 @@ function PostCard({ item }: Props) {
         <img
           src={item.image}
           alt={item.image}
-          className="flex w-full mb-2"
+          className="flex w-full mb-2 object-cover aspect-square"
           onClick={handleImageClick}
         />
 

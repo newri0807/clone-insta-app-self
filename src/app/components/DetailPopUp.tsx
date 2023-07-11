@@ -216,14 +216,14 @@ type Props = {
 
 function DetailPopUp({ item, setShowPopup, userName }: Props) {
   const [comment, setComment] = useState("");
-  const { data, error, isLoading } = useSWR(
-    `/api/account/detail?userId=${userName}`,
-    {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      refreshInterval: 5000,
-    }
-  );
+  // const { data, error, isLoading } = useSWR(
+  //   `/api/account/detail?userId=${userName}`,
+  //   {
+  //     revalidateOnFocus: true,
+  //     revalidateOnReconnect: true,
+  //     refreshInterval: 5000,
+  //   }
+  // );
   console.log(item, `000000`);
 
   function handleSubmit(e: { preventDefault: () => void }) {
@@ -305,7 +305,11 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
         <div className="w-[95%] mx-auto bg-white flex justify-center">
           {/* Popup content goes here */}
 
-          <img src={item.image} alt={item.image} className="w-7/12 h-auto" />
+          <img
+            src={item.image}
+            alt={item.image}
+            className="w-7/12 h-auto object-cover aspect-square"
+          />
           <div className="w-full relative">
             <div className="flex justify-start gap-2 items-center  p-1">
               <Avatar img={item.author.image} active={true} size="small" />

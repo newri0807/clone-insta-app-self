@@ -18,6 +18,9 @@ export const toggleBookmark = async (post_id: string, type: boolean) => {
       } else {
         // 실패한 응답 처리
         console.error("Failed to post Bookmark🔖.");
+        if (response.status === 401) {
+          alert(`로그인 후 사용 가능한 기능입니다.😊`);
+        }
       }
     })
     .catch((error) => {
@@ -45,6 +48,9 @@ export const toggleLike = async (post_id: String) => {
       } else {
         // 실패한 응답 처리
         console.error("Failed to post Like❤️‍🔥.");
+        if (response.status === 401) {
+          alert(`로그인 후 사용 가능한 기능입니다.😊`);
+        }
       }
     })
     .catch((error) => {
