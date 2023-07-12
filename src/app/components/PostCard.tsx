@@ -12,6 +12,7 @@ import { BsBookmark, BsFillBookmarkFill } from "react-icons/bs";
 import { MdInsertEmoticon } from "react-icons/md";
 import { format } from "timeago.js";
 import { Post } from "../service/type";
+import { useSWRConfig } from "swr";
 
 type Props = {
   item: Post;
@@ -21,6 +22,9 @@ function PostCard({ item }: Props) {
   console.log("🔖", item);
   const [comment, setComment] = useState("");
   const { data: session } = useSession();
+  const nowLoginUserId =
+    (session?.user && (session.user as { id: string }).id) || "";
+  const { mutate } = useSWRConfig();
 
   function handleSubmit(e: { preventDefault: () => void }) {
     e.preventDefault(); // 폼의 기본 동작(페이지 새로고침)을 막습니다.
@@ -79,7 +83,15 @@ function PostCard({ item }: Props) {
         />
 
         <div className="flex justify-between w-full mb-2">
-          <p onClick={() => toggleLike(item._id)} className="cursor-pointer">
+          <p
+            onClick={async () => {
+              await toggleLike(item._id, nowLoginUserId).then(() =>
+                // 데이터 업데이트
+                mutate(`/api/following`)
+              );
+            }}
+            className="cursor-pointer"
+          >
             {item.likes &&
             item.likes.some(
               (like: Post) =>
@@ -92,7 +104,12 @@ function PostCard({ item }: Props) {
           </p>
 
           <p
-            onClick={() => toggleBookmark(item._id, item.isBookmarked)}
+            onClick={async () => {
+              await toggleBookmark(item._id, nowLoginUserId).then(() =>
+                // 데이터 업데이트
+                mutate(`/api/following`)
+              );
+            }}
             className="cursor-pointer"
           >
             {item.isBookmarked ? <BsFillBookmarkFill /> : <BsBookmark />}{" "}
