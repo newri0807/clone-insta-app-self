@@ -3,7 +3,7 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
 import { toggleFollow } from "@/app/service/post";
 
-export async function POST(request: Request) {
+export async function PUT(request: Request) {
   const session = await getServerSession(authOptions);
   const userInfo = session?.user;
 

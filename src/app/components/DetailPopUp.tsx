@@ -22,6 +22,8 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
   const { data: session } = useSession();
   const nowLoginUserId =
     (session?.user && (session.user as { id: string }).id) || "";
+
+  // 🎁 mutate 업데이트 작성법1
   const { mutate } = useSWRConfig();
 
   // const { data, error, isLoading } = useSWR(
@@ -32,6 +34,18 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
   //     refreshInterval: 5000,
   //   }
   // );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      mutate(`/api/account/detail?userId=${userName}`); // 데이터 갱신
+    }, 10000); // 10초마다 갱신
+
+    return () => {
+      clearInterval(interval); // 컴포넌트 언마운트 시 타이머 정리
+    };
+  }, []);
+
+  console.log(item, "-------", userName);
 
   function handleSubmit(e: { preventDefault: () => void }) {
     e.preventDefault(); // 폼의 기본 동작(페이지 새로고침)을 막습니다.
@@ -59,6 +73,10 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
         } else {
           // 실패한 응답 처리
           console.error("Failed to post comment.");
+          if (response.status === 401) {
+            alert(`로그인 후 사용 가능한 기능입니다.😊`);
+            return;
+          }
         }
       })
       .catch((error) => {
@@ -69,10 +87,10 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
   const toggleLikeStatus = async () => {
     try {
       // 좋아요 상태 토글 요청 보내기
-      await toggleLike(item._id, nowLoginUserId).then(() =>
-        // 데이터 업데이트
-        mutate(`/api/account/detail?userId=${userName}`)
-      );
+      await Promise.all([
+        toggleLike(item._id, nowLoginUserId),
+        mutate(`/api/account/detail?userId=${userName}`),
+      ]);
     } catch (error) {
       console.error("Failed to toggle like status:", error);
     }
@@ -81,10 +99,10 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
   const toggleBookmarkStatus = async () => {
     try {
       // 북마크 상태 토글 요청 보내기
-      await toggleBookmark(item._id, nowLoginUserId).then(() =>
-        // 데이터 업데이트
-        mutate(`/api/account/detail?userId=${userName}`)
-      );
+      await Promise.all([
+        toggleBookmark(item._id, nowLoginUserId),
+        mutate(`/api/account/detail?userId=${userName}`),
+      ]);
     } catch (error) {
       console.error("Failed to toggle bookmark status:", error);
     }
@@ -150,10 +168,11 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
                   </p>
 
                   <p onClick={toggleBookmarkStatus} className="cursor-pointer">
-                    {item.bookMarks &&
-                    item.bookMarks.some(
-                      (bookmark: string) => bookmark === item._id
-                    ) ? (
+                    {(item.bookMarks &&
+                      item.bookMarks.some(
+                        (bookmark: string) => bookmark === item._id
+                      )) ||
+                    item?.isBookmarked ? (
                       <BsFillBookmarkFill />
                     ) : (
                       <BsBookmark />

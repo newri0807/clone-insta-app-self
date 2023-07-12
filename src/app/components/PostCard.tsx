@@ -52,6 +52,10 @@ function PostCard({ item }: Props) {
         } else {
           // 실패한 응답 처리
           console.error("Failed to post comment.");
+          if (response.status === 401) {
+            alert(`로그인 후 사용 가능한 기능입니다.😊`);
+            return;
+          }
         }
       })
       .catch((error) => {

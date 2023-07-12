@@ -15,7 +15,7 @@ function AccountDetailHeader({ username }: props) {
   const nowLoginUserName =
     session?.user && (session.user as { username: string }).username;
 
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     `/api/account/detail?userId=${username}`
   );
   //const { mutate } = useSWRConfig();
@@ -28,7 +28,7 @@ function AccountDetailHeader({ username }: props) {
       </div>
     );
 
-  console.log(session?.user, `로그인 확인--------------`, data);
+  //console.log(session?.user, `로그인 확인--------------`, data);
 
   const toggleFollow = (id: string) => {
     const data_ = {
@@ -36,17 +36,35 @@ function AccountDetailHeader({ username }: props) {
       userId: localStorage.getItem("userId") || "",
     };
 
+    const optimisticData = {
+      ...data,
+      user: {
+        ...data.user,
+        following: data.isLoginUserFollowing
+          ? data.user.following &&
+            data.user.following.filter((userId: string) => userId !== id)
+          : [...(data.user.following || []), id],
+      },
+      isLoginUserFollowing: !data.isLoginUserFollowing,
+    };
+
     fetch("/api/post/follow", {
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data_),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (response.ok) {
           // 성공적인 응답 처리
-          mutate(`/api/account/detail?userId=${username}`);
+          // 🎁 mutate 업데이트 작성법2
+          await mutate(`/api/account/detail?userId=${username}`, {
+            optimisticData: optimisticData,
+            populateCache: false,
+            revalidate: false,
+            rollbackOnError: false,
+          });
           console.log("following change successfully!", data);
         } else {
           // 실패한 응답 처리
@@ -60,46 +78,48 @@ function AccountDetailHeader({ username }: props) {
 
   return (
     <div>
-      <>
-        <div className="flex justify-center gap-1 w-full m-auto">
-          <div className="w-6/12 flex justify-end mr-2">
-            <Avatar img={data.user.image} active={true} size="" />
-          </div>
+      {data && (
+        <>
+          <div className="flex justify-center gap-1 w-full m-auto">
+            <div className="w-6/12 flex justify-end mr-2">
+              <Avatar img={data.user.image} active={true} size="" />
+            </div>
 
-          <div className="w-6/12 flex justify-around items-center gap-2 flex-wrap ">
-            <div className="w-full flex justify-start gap-2 items-center">
-              <p>{data.user.username}</p>
-              {session?.user && data.user.username !== nowLoginUserName && (
-                <button
-                  onClick={() => toggleFollow(data?.user?.id)}
-                  className={`rounded-md text-white text-center min-w-[100px] p-1 ${
-                    data.isLoginUserFollowing ? `bg-red-700` : `bg-blue-500`
-                  }`}
-                >
-                  {data.isLoginUserFollowing ? `unfollow` : `follow`} {}
-                </button>
-              )}
+            <div className="w-6/12 flex justify-around items-center gap-2 flex-wrap ">
+              <div className="w-full flex justify-start gap-2 items-center">
+                <p>{data.user.username}</p>
+                {session?.user && data.user.username !== nowLoginUserName && (
+                  <button
+                    onClick={() => toggleFollow(data?.user?.id)}
+                    className={`rounded-md text-white text-center min-w-[100px] p-1 ${
+                      data.isLoginUserFollowing ? `bg-red-700` : `bg-blue-500`
+                    }`}
+                  >
+                    {data.isLoginUserFollowing ? `unfollow` : `follow`} {}
+                  </button>
+                )}
+              </div>
+              <div className="w-full flex justify-start gap-2 text-sm items-center">
+                <p>
+                  {" "}
+                  <strong>
+                    {data.uploadingAllPosts?.length || 0}
+                  </strong> posts{" "}
+                </p>
+                <p>
+                  <strong>{data.user.followers?.length || 0}</strong> followers
+                </p>
+                <p>
+                  <strong>{data.user.following?.length || 0}</strong> following
+                </p>
+              </div>
+              <strong className="w-full flex justify-start gap-2 text-sm items-center">
+                {data.user?.name || ""}
+              </strong>
             </div>
-            <div className="w-full flex justify-start gap-2 text-sm items-center">
-              <p>
-                {" "}
-                <strong>
-                  {data.uploadingAllPosts?.length || 0}
-                </strong> posts{" "}
-              </p>
-              <p>
-                <strong>{data.user.followers?.length || 0}</strong> followers
-              </p>
-              <p>
-                <strong>{data.user.following?.length || 0}</strong> following
-              </p>
-            </div>
-            <strong className="w-full flex justify-start gap-2 text-sm items-center">
-              {data.user?.name || ""}
-            </strong>
           </div>
-        </div>
-      </>
+        </>
+      )}
     </div>
   );
 }

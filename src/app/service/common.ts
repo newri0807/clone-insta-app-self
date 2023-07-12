@@ -8,7 +8,7 @@ export const toggleBookmark = async (
   };
 
   await fetch("/api/post/bookmark", {
-    method: "POST",
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
@@ -39,7 +39,7 @@ export const toggleLike = async (post_id: String, nowLoginUserName: string) => {
   };
 
   await fetch("/api/post/like", {
-    method: "POST",
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
