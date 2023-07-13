@@ -10,6 +10,7 @@ import { format } from "timeago.js";
 import { Post } from "../service/type";
 import useSWR, { mutate, useSWRConfig } from "swr";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 type Props = {
   item: Post;
@@ -20,6 +21,7 @@ type Props = {
 function DetailPopUp({ item, setShowPopup, userName }: Props) {
   const [comment, setComment] = useState("");
   const { data: session } = useSession();
+  const router = useRouter();
   const nowLoginUserId =
     (session?.user && (session.user as { id: string }).id) || "";
 
@@ -91,6 +93,7 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
         toggleLike(item._id, nowLoginUserId),
         mutate(`/api/account/detail?userId=${userName}`),
       ]);
+      router.refresh();
     } catch (error) {
       console.error("Failed to toggle like status:", error);
     }
@@ -103,6 +106,7 @@ function DetailPopUp({ item, setShowPopup, userName }: Props) {
         toggleBookmark(item._id, nowLoginUserId),
         mutate(`/api/account/detail?userId=${userName}`),
       ]);
+      router.refresh();
     } catch (error) {
       console.error("Failed to toggle bookmark status:", error);
     }
